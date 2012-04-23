@@ -22,9 +22,7 @@ void relative_queue_insert(event_bin_t* head, event_t e) {
     // first
     if((rank_acc + head->e.rank) > e.rank) { // insert as new head
         new->e.rank = e.rank;
-
         head->e.rank -= new->e.rank;
-
         new->next = head;
         return;
     }
@@ -36,12 +34,9 @@ void relative_queue_insert(event_bin_t* head, event_t e) {
 
         if((rank_acc + succ->e.rank) > e.rank) { // insert here
             new->e.rank = e.rank - rank_acc;
-
             succ->e.rank -= new->e.rank;
-
             pred->next = new;
             new->next = succ;
-
             return;
         }
     }
@@ -49,7 +44,6 @@ void relative_queue_insert(event_bin_t* head, event_t e) {
     // last
     rank_acc += pred->e.rank;
     new->e.rank = e.rank - rank_acc;
-
     pred->next = new;
     new->next = (event_bin_t*) 0;
 }
