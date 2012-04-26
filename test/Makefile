@@ -54,7 +54,8 @@ PROJECTNAME=relative_queue_test
 # Use .cc, .cpp or .C suffix for C++ files, use .S 
 # (NOT .s !!!) for assembly source code files.
 PRJSRC=relative_queue_test.c \
-	   ../src/relative_queue.c
+	   debug.c \
+	   ../src/relative_queue.c \
 
 # additional includes (e.g. -I/path/to/mydir)
 INC=

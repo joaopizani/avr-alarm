@@ -8,6 +8,7 @@
 #define RELATIVE_QUEUE_H
 
 #include <stdint.h>
+#include <stdio.h>
 
 
 typedef void (*handler_t)(void);
@@ -22,21 +23,24 @@ typedef struct _event_bin_t {
     struct _event_bin_t* next;
 } event_bin_t;
 
-typedef event_bin_t relative_queue_t;
+typedef struct _relative_queue_t {
+    event_bin_t* head;
+} relative_queue_t;
 
 
-/*
- * Creates a singleton queue, with a COPY of the specified element
+/** Creates a singleton queue, with a COPY of the specified element
  * We cannot create empty queues.
  */
-event_bin_t* relative_queue_create(event_t e);
+relative_queue_t* relative_queue_create(event_t e);
 
-/*
- * Inserts a COPY of the specified element into the queue. The
- * queue pointed to by head must not be empty. That's guaranteed if
- * it was created with relative_queue_create.
+/** Inserts a COPY of the specified element into the queue.
+ * The queue pointed to by head must not be empty. That's guaranteed
+ * if it was created with relative_queue_create(event_t e);.
  */
-void relative_queue_insert(event_bin_t* head, event_t e);
+void relative_queue_insert(relative_queue_t* head, event_t e);
+
+/// Prints a relative queue to a stream device
+void print_queue(FILE* out, relative_queue_t* q);
 
 
 #endif /* end of include guard: RELATIVE_QUEUE_H */

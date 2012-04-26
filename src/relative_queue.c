@@ -1,20 +1,25 @@
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "relative_queue.h"
 
 
-event_bin_t* relative_queue_create(event_t e) {
+relative_queue_t* relative_queue_create(event_t e) {
+    relative_queue_t* q = (relative_queue_t*) malloc(sizeof(relative_queue_t));
     event_bin_t* head = (event_bin_t*) malloc(sizeof(event_bin_t));
 
     head->e.rank = e.rank;
     head->e.handler = e.handler;
     head->next = (event_bin_t*) 0;
 
-    return head;
+    q->head = head;
+
+    return q;
 }
 
-void relative_queue_insert(event_bin_t* head, event_t e) {
+void relative_queue_insert(relative_queue_t* q, event_t e) {
     uint16_t rank_acc = 0;
+    event_bin_t* head = q->head;
 
     event_bin_t* new = (event_bin_t*) malloc(sizeof(event_bin_t));
     new->e.handler = e.handler;
@@ -22,8 +27,9 @@ void relative_queue_insert(event_bin_t* head, event_t e) {
     // first
     if((rank_acc + head->e.rank) > e.rank) { // insert as new head
         new->e.rank = e.rank;
-        head->e.rank -= new->e.rank;
         new->next = head;
+        head->e.rank -= new->e.rank;
+        q->head = new;
         return;
     }
 
@@ -46,5 +52,18 @@ void relative_queue_insert(event_bin_t* head, event_t e) {
     new->e.rank = e.rank - rank_acc;
     pred->next = new;
     new->next = (event_bin_t*) 0;
+}
+
+
+void print_queue(FILE* out, relative_queue_t* q) {
+    fprintf(out, "head_addr=(%p) {\n", q->head);
+
+    event_bin_t* it = q->head;
+    do {
+        fprintf(out, "\trank=%d, handler=(%p)\n", it->e.rank, it->e.handler);
+        it = it->next;
+    } while(it != (event_bin_t*) 0);
+
+    fprintf(out, "}\n");
 }
 
