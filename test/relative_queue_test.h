@@ -8,11 +8,12 @@
 #ifndef RELATIVE_QUEUE_TEST_H
 #define RELATIVE_QUEUE_TEST_H
 
-#include <avr/stdio.h>
+#include "../src/relative_queue.h"
+
 
 void testInsertFiveElementsOutOfOrder(void);
 
-void testQueueStoredRanks(relative_queue_t* queue, int* expected_ranks);
+void compareQueueStoredRanks(relative_queue_t* queue, int* expected_ranks);
 
 
 #endif /* end of include guard: RELATIVE_QUEUE_TEST_H */

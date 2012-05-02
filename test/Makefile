@@ -53,9 +53,10 @@ PROJECTNAME=relative_queue_test
 # (list all files to compile, e.g. 'a.c b.cpp as.S'):
 # Use .cc, .cpp or .C suffix for C++ files, use .S 
 # (NOT .s !!!) for assembly source code files.
-PRJSRC=relative_queue_test.c \
+PRJSRC=main.c \
 	   debug.c \
-	   ../src/relative_queue.c \
+	   relative_queue_test.c \
+	   ../src/relative_queue.c
 
 # additional includes (e.g. -I/path/to/mydir)
 INC=

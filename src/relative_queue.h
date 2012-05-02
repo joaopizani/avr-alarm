@@ -34,10 +34,20 @@ typedef struct _relative_queue_t {
 relative_queue_t* relative_queue_create(event_t e);
 
 /** Inserts a COPY of the specified element into the queue.
- * The queue pointed to by head must not be empty. That's guaranteed
+ * The queue pointed to by q must not be empty. That's guaranteed
  * if it was created with relative_queue_create(event_t e);.
  */
-void relative_queue_insert(relative_queue_t* head, event_t e);
+void relative_queue_insert(relative_queue_t* q, event_t e);
+
+/** Removes the first element in the queue that matches with the given event.
+ * The queue pointed to by q must not be empty.
+ */
+void relative_queue_remove(relative_queue_t* q, event_t e);
+
+/** Gets the head (first element) of a queue.
+ * Returns a pointer to the first element, allowing it to be modified.
+ */
+event_t* relative_queue_head(relative_queue_t* q);
 
 /// Prints a relative queue to a stream device
 void print_queue(FILE* out, relative_queue_t* q);

@@ -67,3 +67,35 @@ void print_queue(FILE* out, relative_queue_t* q) {
     fprintf(out, "}\n");
 }
 
+void relative_queue_remove(relative_queue_t* q, event_t e) {
+    if(q->head->e.handler == e.handler) { // remove first
+        q->head->next->e.rank += q->head->e.rank;
+
+        event_bin_t* new_head = q->head->next;
+        free(q->head);
+        q->head = new_head;
+        return;
+    }
+
+    event_bin_t *pred, *succ;
+    for(pred = q->head, succ = pred->next; succ->next != NULL; pred = pred->next, succ = succ->next) { // in between
+        if(succ->e.handler == e.handler) { // found
+            succ->next->e.rank += succ->e.rank;
+
+            pred->next = succ->next;
+            free(succ);
+            return;
+        }
+    }
+
+    if(succ->e.handler == e.handler) { // remove last
+        free(succ);
+        pred->next = NULL;
+    }
+}
+
+event_t* relative_queue_head(relative_queue_t* q) {
+    return &(q->head->e);
+}
+
+
