@@ -53,17 +53,21 @@ PROJECTNAME=relative_queue_test
 # (list all files to compile, e.g. 'a.c b.cpp as.S'):
 # Use .cc, .cpp or .C suffix for C++ files, use .S 
 # (NOT .s !!!) for assembly source code files.
-PRJSRC=main.c \
-	   debug.c \
-	   relative_queue_test.c \
-	   ../src/relative_queue.c \
-	   ../src/alarm.c
+PRJSRC=test/main.c \
+	   test/debug.c \
+	   test/relative_queue_test.c \
+	   src/relative_queue.c \
+	   src/alarm.c
+
+
+include paths.def
 
 # additional includes (e.g. -I/path/to/mydir)
-INC=-I../../avr-wavegen/avrutils/include
+INC=${EXT_INCFLAGS}
 
 # libraries to link in (e.g. -lmylib)
-LIBS=-L.. -Wl,--whole-archive -lavrutils-atmega168p -Wl,--no-whole-archive
+LIBS=${EXT_LIBFLAGS}
+
 
 # additional macro definition flags
 DEFS=-DF_CPU=16000000UL
