@@ -56,13 +56,14 @@ PROJECTNAME=relative_queue_test
 PRJSRC=main.c \
 	   debug.c \
 	   relative_queue_test.c \
-	   ../src/relative_queue.c
+	   ../src/relative_queue.c \
+	   ../src/alarm.c
 
 # additional includes (e.g. -I/path/to/mydir)
-INC=
+INC=-I../../avr-wavegen/avrutils/include
 
 # libraries to link in (e.g. -lmylib)
-LIBS=
+LIBS=-L.. -Wl,--whole-archive -lavrutils-atmega168p -Wl,--no-whole-archive
 
 # additional macro definition flags
 DEFS=-DF_CPU=16000000UL
