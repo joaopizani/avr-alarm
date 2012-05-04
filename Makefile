@@ -46,7 +46,7 @@ PROGRAMMER_MCU=$(MCU)
 
 # Name of our project
 # (use a single word, e.g. 'myproject')
-PROJECTNAME=relative_queue_test
+PROJECTNAME=alarm_test
 
 # Source files
 # List C/C++/Assembly source files:
@@ -55,7 +55,9 @@ PROJECTNAME=relative_queue_test
 # (NOT .s !!!) for assembly source code files.
 PRJSRC=test/main.c \
 	   test/debug.c \
+	   test/assert_helpers.c \
 	   test/relative_queue_test.c \
+	   test/alarm_test.c \
 	   src/relative_queue.c \
 	   src/alarm.c
 

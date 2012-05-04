@@ -24,8 +24,9 @@ typedef uint16_t time_ms_t;
  */
 void alarm_init(void);
 
-void alarm_timer_init(void);
-
+/** Starts the underlying alarm timer. At this moment the alarm starts counting time.
+ */
+void alarm_timer_start(void);
 
 /** Inserts a new element into the alarm's queue.
  */
