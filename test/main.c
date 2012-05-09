@@ -6,6 +6,7 @@
  *
  */
 #include <stdio.h>
+#include <avr/interrupt.h>
 #include "debug.h"
 #include "relative_queue_test.h"
 #include "alarm_test.h"
@@ -18,11 +19,16 @@ int main(void) {
     /// relative_queue tests
     testInsertFiveElementsOutOfOrder();
 
+    // we have to globally enable interrupts
+    sei();
+
     /// alarm tests
     testAlarmInitButNotStartHasZeroedHead();
     testAlarmWithoutInsertingAnythingGetNextOfHead();
     testFollowerOfHeadAfterInsertingOne();
     testAlarmInsertionOfThreeEvents();
+    testDummyHeadIsGoneAfterSomeTimeRunning();
+    testDummyHandlerAndE2HandlerHaveRunAfterEnoughTime();
 
     printf("Tests finished. If no error messages were displayed, success!\n");
 
