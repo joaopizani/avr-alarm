@@ -21,18 +21,17 @@ void alarm_init(void) {
     alarm_queue = relative_queue_create(e);
 
     // configuring the underlying alarm timer
-    TCCR1A |= _BV(WGM11); // clear on compare match
+    TCCR1B |= _BV(WGM12); // clear on compare match
     TIMSK1 |= _BV(OCIE1A); // enable compare match intr.
 
     // set compare match to 1ms
-    const uint32_t alarmTimerPeriodCount = ALARM_TIMER_FREQ_HZ / 1000;
-    const uint32_t alarmTimerToggleCount = alarmTimerPeriodCount / 2;
-    OCR1A = alarmTimerToggleCount;
+    const uint16_t alarmTimerPeriodCount = ALARM_TIMER_FREQ_HZ / 1000;
+    OCR1A = alarmTimerPeriodCount;
 }
 
 void alarm_timer_start(void) {
-    // start timer
-    TCCR1B = getTimerPrescaleBits(ALARM_PRESCALE);
+    // start timer 1024
+    TCCR1B |= 0b00000101; // TODO change to function specific of TIMER1
 }
 
 void alarm_insert(time_ms_t timeout, handler_t handler) {
@@ -46,13 +45,14 @@ inline void alarm_intr_handler(void) {
     event_t* head = relative_queue_head(alarm_queue);
     if(head == NULL) return;
 
-    (head->rank)--;
-    if(head->rank <= 0) {
-        sei();
+    if((head->rank) == 0) {
         handler_t f = head->handler;
         relative_queue_remove(alarm_queue, *head);
+        sei();
         (*f)();
     }
+
+    (head->rank)--;
 }
 
 /// main alarm timer interrupt handler.
