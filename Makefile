@@ -76,7 +76,7 @@ DEFS=-DF_CPU=16000000UL
 
 # Optimization level, 
 # use s (size opt), 1, 2, 3 or 0 (off)
-OPTLEVEL=s
+OPTLEVEL=1
 
 
 #####      AVR Dude 'writeflash' options       #####
