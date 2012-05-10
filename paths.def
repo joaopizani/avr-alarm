@@ -1,9 +1,9 @@
-AVRUTILS_ROOT=/home/joaopizani/build/avr/avrutils
+AVRUTILS_ROOT=/home/joaopizani/build/avr/avr-utils
 AVRUTILS_INCLUDE=${AVRUTILS_ROOT}/include
 AVRUTILS_LIBS=${AVRUTILS_ROOT}/lib
 
 AVRUTILS_INCFLAGS = -I${AVRUTILS_INCLUDE}
-AVRUTILS_LIBFLAGS = -Wl,--whole-archive -L${AVRUTILS_LIBS} -lavrutils-atmega168p -Wl,--no-whole-archive
+AVRUTILS_LIBFLAGS = -Wl,--whole-archive -L${AVRUTILS_LIBS} -lavr-utils-atmega168p -Wl,--no-whole-archive
 
 
 EXT_INCFLAGS=${AVRUTILS_INCFLAGS}

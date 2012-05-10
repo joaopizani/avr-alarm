@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include <avrutils/timers-atmega168p.h>
+#include <timers-atmega168p.h>
 #include "alarm.h"
 
 
