@@ -240,7 +240,7 @@ $(DUMPTRG): $(TRG)
 
 
 $(EXETRG): $(OBJDEPS)
-	$(CC) $(LDFLAGS) -o $(TRG) $(OBJDEPS)
+	$(CC)  -o $(TRG) $(OBJDEPS) $(LDFLAGS)
 
 $(LIBTRG): $(OBJDEPS)
 	$(REMOVE) $@
