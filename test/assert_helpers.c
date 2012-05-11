@@ -12,39 +12,32 @@
 #include "assert_helpers.h"
 
 
-PGM_P error_msg_different_ptr = ""
-    "ERROR: (void*)expected != (void*)actual\n"
-    "    expected: %p\n"
-    "    actual: %p\n";
 
-PGM_P error_msg_different_uint8 = ""
-    "ERROR: (uint8_t)expected != (uint8_t)actual\n"
-    "    expected: %d\n"
-    "    actual: %d\n";
+char* error_msg_different_ptr = ""
+    "ERR: (ptr)e != (ptr)a\n"
+    "\te=%p\n"
+    "\ta=%p\n";
 
-PGM_P error_msg_different_uint16 = ""
-    "ERROR: (uint16_t)expected != (uint16_t)actual\n"
-    "    expected: %d\n"
-    "    actual: %d\n";
+char* error_msg_different_int = ""
+    "ERR: (u-int8-16)e != (u-int8-16)a\n"
+    "\te=%d\n"
+    "\ta=%d\n";
 
-PGM_P error_msg_different_str = ""
-    "ERROR: (char[])expected != (char[])actual\n"
-    "    expected: %s\n"
-    "    actual: %s\n";
+char* error_msg_different_str = ""
+    "ERR: (str)e != (str)a\n"
+    "\te=%s\n"
+    "\ta=%s\n";
 
-PGM_P error_msg_null_ptr = ""
-    "ERROR: a pointer is null, which should not be.\n";
+char* error_msg_null_ptr = ""
+    "ERR: a pointer is unexpectedly null.\n";
 
-PGM_P error_msg_not_null_ptr = ""
-    "ERROR: a pointer, which SHOULD be null, isn't\n";
+char* error_msg_not_null_ptr = ""
+    "ERR: a pointer is unexpectedly non-null.\n";
 
 
 int assert_equal_ptr(void* expected, void* actual) {
-    char msg_buffer[200];
-
     if(expected != actual) {
-        strcpy_P(msg_buffer, (PGM_P) &error_msg_different_ptr);
-        printf(msg_buffer, expected, actual);
+        printf(error_msg_different_ptr, expected, actual);
         return 0;
     }
 
@@ -52,15 +45,17 @@ int assert_equal_ptr(void* expected, void* actual) {
 }
 
 int assert_equal_uint8(uint8_t expected, uint8_t actual) {
-    return 0; //TODO
+    if(expected != actual) {
+        printf(error_msg_different_int, expected, actual);
+        return 0;
+    }
+
+    return 1;
 }
 
 int assert_equal_uint16(uint16_t expected, uint16_t actual) {
-    char msg_buffer[200];
-
     if(expected != actual) {
-        strcpy_P(msg_buffer, (PGM_P) &error_msg_different_uint16);
-        printf(msg_buffer, expected, actual);
+        printf(error_msg_different_int, expected, actual);
         return 0;
     }
 
@@ -68,7 +63,12 @@ int assert_equal_uint16(uint16_t expected, uint16_t actual) {
 }
 
 int assert_equal_int(int expected, int actual) {
-    return 0; //TODO
+    if(expected != actual) {
+        printf(error_msg_different_int, expected, actual);
+        return 0;
+    }
+
+    return 1;
 }
 
 int assert_equal_str(char* expected, char* actual) {
@@ -76,11 +76,8 @@ int assert_equal_str(char* expected, char* actual) {
 }
 
 int assert_not_null(void* actual) {
-    char msg_buffer[200];
-
     if(actual == NULL) {
-        strcpy_P(msg_buffer, (PGM_P) &error_msg_null_ptr);
-        printf(msg_buffer);
+        printf(error_msg_null_ptr);
         return 0;
     }
 
@@ -88,11 +85,8 @@ int assert_not_null(void* actual) {
 }
 
 int assert_is_null(void* actual) {
-    char msg_buffer[200];
-
     if(actual != NULL) {
-        strcpy_P(msg_buffer, (PGM_P) &error_msg_not_null_ptr);
-        printf(msg_buffer);
+        printf(error_msg_not_null_ptr);
         return 0;
     }
 

@@ -32,5 +32,7 @@ int main(void) {
 
     printf("Tests finished. If no error messages were displayed, success!\n");
 
+    while(1); // we must have a loop, otherwise it doesn't make any sense :P
+
     return 0;
 }

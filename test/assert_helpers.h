@@ -12,12 +12,12 @@
 #include <avr/pgmspace.h>
 
 
-PGM_P error_msg_different_ptr;
-PGM_P error_msg_different_uint8;
-PGM_P error_msg_different_uint16;
-PGM_P error_msg_different_str;
-PGM_P error_msg_null_ptr;
-PGM_P error_msg_not_null_ptr;
+char* error_msg_different_ptr;
+char* error_msg_different_uint8;
+char* error_msg_different_uint16;
+char* error_msg_different_str;
+char* error_msg_null_ptr;
+char* error_msg_not_null_ptr;
 
 
 /// checks that a pointer isn't null and prints an error message if it is.

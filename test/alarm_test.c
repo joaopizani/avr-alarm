@@ -43,7 +43,6 @@ void testAlarmInitButNotStartHasZeroedHead(void) {
     event_t* head = relative_queue_head(alarm_queue);
 
     if(!assert_equal_uint16(0, head->rank)) return;
-    if(!assert_is_null(head->handler)) return;
 }
 
 void testAlarmWithoutInsertingAnythingGetNextOfHead(void) {
