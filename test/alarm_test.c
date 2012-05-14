@@ -122,7 +122,7 @@ void testDummyHandlerAndE2HandlerHaveRunAfterEnoughTime(void) {
 }
 
 void testGetRankOfLastValueReturnsCloseToTheRankOfE3(void) {
-    uint16_t rankSum = rank_sum(alarm_queue);
+    uint16_t rankSum = relative_queue_rank_sum(alarm_queue);
 
     if(rankSum > ((TEST_E3_TIMOUT - TEST_E1_TIMOUT) + alarm_queue->head->e.rank)
     || rankSum < 3) {

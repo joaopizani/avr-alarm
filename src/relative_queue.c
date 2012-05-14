@@ -96,7 +96,7 @@ event_t* relative_queue_last(relative_queue_t* q) {
     return &(q->last->e);
 }
 
-uint16_t rank_sum(relative_queue_t* q) {
+uint16_t relative_queue_rank_sum(relative_queue_t* q) {
     uint16_t sum = 0;
 
     event_bin_t* it;

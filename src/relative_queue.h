@@ -59,7 +59,7 @@ event_t* relative_queue_last(relative_queue_t* q);
 /** Gets the absoulte (non-relative) rank of the last element
  * in the queue.
  */
-uint16_t rank_sum(relative_queue_t* q);
+uint16_t relative_queue_rank_sum(relative_queue_t* q);
 
 
 /// Prints a relative queue to a stream device

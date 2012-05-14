@@ -9,6 +9,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <timers-atmega168p.h>
+#include "relative_queue.h"
 #include "alarm.h"
 
 
@@ -40,6 +41,10 @@ void alarm_insert(time_ms_t timeout, handler_t handler, void* arg_ptr) {
     e.handler = handler;
     e.arg_ptr = arg_ptr;
     relative_queue_insert(alarm_queue, e);
+}
+
+time_ms_t alarm_until_last_deadline(void) {
+    return relative_queue_rank_sum(alarm_queue);
 }
 
 inline void alarm_intr_handler(void) {

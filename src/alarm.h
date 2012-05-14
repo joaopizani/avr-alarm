@@ -34,6 +34,10 @@ void alarm_timer_start(void);
  */
 void alarm_insert(time_ms_t timeout, handler_t handler, void* arg_ptr);
 
+/** Returns the amount of time that STILL has to pass until the last deadline is reached.
+*/
+time_ms_t alarm_until_last_deadline(void);
+
 /** Alarm interrupt handler.
  */
 inline void alarm_intr_handler(void);
