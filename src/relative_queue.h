@@ -11,10 +11,11 @@
 #include <stdio.h>
 
 
-typedef void (*handler_t)(void);
+typedef void (*handler_t)(void*);
 
 typedef struct _event_t {
     uint16_t rank;
+    void* arg_ptr;
     handler_t handler;
 } event_t;
 

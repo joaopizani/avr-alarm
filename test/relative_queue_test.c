@@ -14,6 +14,7 @@
 void testInsertFiveElementsOutOfOrder(void) {
     event_t e;
     e.handler = NULL;
+    e.arg_ptr = NULL;
 
     e.rank = 10;
     relative_queue_t* q = relative_queue_create(e);

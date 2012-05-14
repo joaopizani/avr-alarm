@@ -5,11 +5,12 @@
 
 
 relative_queue_t* relative_queue_create(event_t e) {
-    relative_queue_t* q = (relative_queue_t*) malloc(sizeof(relative_queue_t));
-    event_bin_t* head = (event_bin_t*) malloc(sizeof(event_bin_t));
+    relative_queue_t* q = (relative_queue_t*) calloc(1, sizeof(relative_queue_t));
+    event_bin_t* head = (event_bin_t*) calloc(1, sizeof(event_bin_t));
 
     head->e.rank = e.rank;
     head->e.handler = e.handler;
+    head->e.arg_ptr = NULL;
     head->next = (event_bin_t*) 0;
 
     q->head = head;
@@ -17,12 +18,14 @@ relative_queue_t* relative_queue_create(event_t e) {
     return q;
 }
 
+
 void relative_queue_insert(relative_queue_t* q, event_t e) {
     uint16_t rank_acc = 0;
     event_bin_t* head = q->head;
 
-    event_bin_t* new = (event_bin_t*) malloc(sizeof(event_bin_t));
+    event_bin_t* new = (event_bin_t*) calloc(1, sizeof(event_bin_t));
     new->e.handler = e.handler;
+    new->e.arg_ptr = e.arg_ptr;
 
     // first
     if((rank_acc + head->e.rank) > e.rank) { // insert as new head
@@ -60,12 +63,13 @@ void print_queue(FILE* out, relative_queue_t* q) {
 
     event_bin_t* it = q->head;
     do {
-        fprintf(out, "\trank=%d, handler=(%p)\n", it->e.rank, it->e.handler);
+        fprintf(out, "\trank=%d, handler=(%p), arg_ptr=(%p)\n", it->e.rank, it->e.handler, it->e.arg_ptr);
         it = it->next;
     } while(it != (event_bin_t*) 0);
 
     fprintf(out, "}\n");
 }
+
 
 void relative_queue_remove(relative_queue_t* q, event_t e) {
     if(q->head->e.handler == e.handler) { // remove first

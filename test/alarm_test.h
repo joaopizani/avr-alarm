@@ -17,10 +17,8 @@ void testDummyHeadIsGoneAfterSomeTimeRunning(void);
 void testDummyHandlerAndE2HandlerHaveRunAfterEnoughTime(void);
 
 
-void dummy_handler(void);
-void e1_handler(void);
-void e2_handler(void);
-void e3_handler(void);
+void dummy_handler(void* arg_ptr);
+void assign_handler(void* arg_ptr);
 
 
 #endif /* end of include guard: ALARM_TEST_H */

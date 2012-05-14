@@ -29,8 +29,10 @@ void alarm_init(void);
 void alarm_timer_start(void);
 
 /** Inserts a new element into the alarm's queue.
+ * Receives as argument the timeout in miliseconds, a pointer to a handler function and
+ * a pointer to an argument which will be passed to the handler function.
  */
-void alarm_insert(time_ms_t timeout, handler_t handler);
+void alarm_insert(time_ms_t timeout, handler_t handler, void* arg_ptr);
 
 /** Alarm interrupt handler.
  */

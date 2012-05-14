@@ -18,16 +18,16 @@
 #define TEST_E2_TIMOUT 50
 #define TEST_E1_TIMOUT 80
 #define TEST_E3_TIMOUT 97
-#define TEST_E1_HANDLE_FUNC e1_handler
-#define TEST_E2_HANDLE_FUNC e2_handler
-#define TEST_E3_HANDLE_FUNC e3_handler
+#define TEST_E1_ARG 1
+#define TEST_E2_ARG 2
+#define TEST_E3_ARG 3
 
 uint16_t test_e2_timeout = TEST_E2_TIMOUT;
 uint16_t test_e1_timeout = TEST_E1_TIMOUT;
 uint16_t test_e3_timeout = TEST_E3_TIMOUT;
-handler_t test_e1_handler = TEST_E1_HANDLE_FUNC;
-handler_t test_e2_handler = TEST_E2_HANDLE_FUNC;
-handler_t test_e3_handler = TEST_E3_HANDLE_FUNC;
+uint16_t test_e1_arg = TEST_E1_ARG;
+uint16_t test_e2_arg = TEST_E2_ARG;
+uint16_t test_e3_arg = TEST_E3_ARG;
 
 int handler_flag_value = 0;
 
@@ -54,7 +54,9 @@ void testAlarmWithoutInsertingAnythingGetNextOfHead(void) {
 }
 
 void testFollowerOfHeadAfterInsertingOne(void) {
-    alarm_insert(test_e1_timeout, test_e1_handler);
+    int* e1_arg = malloc(sizeof(int));
+    *e1_arg = test_e1_arg;
+    alarm_insert(test_e1_timeout, assign_handler, e1_arg);
 
     event_bin_t* head = alarm_queue->head;
     if(!assert_not_null(head)) return;
@@ -63,13 +65,18 @@ void testFollowerOfHeadAfterInsertingOne(void) {
     if(!assert_not_null(follow_head)) return;
 
     if(!assert_equal_uint16(test_e1_timeout, follow_head->e.rank)) return;
-
-    if(!assert_equal_ptr(test_e1_handler, follow_head->e.handler)) return;
+    if(!assert_equal_ptr(assign_handler, follow_head->e.handler)) return;
+    assert_equal_ptr(e1_arg, follow_head->e.arg_ptr);
 }
 
 void testAlarmInsertionOfThreeEvents(void) {
-    alarm_insert(test_e2_timeout, test_e2_handler);
-    alarm_insert(test_e3_timeout, test_e3_handler);
+    int* e2_arg = malloc(sizeof(int));
+    *e2_arg = test_e2_arg;
+    alarm_insert(test_e2_timeout, assign_handler, e2_arg);
+
+    int* e3_arg = malloc(sizeof(int));
+    *e3_arg = test_e3_arg;
+    alarm_insert(test_e3_timeout, assign_handler, e3_arg);
 
     event_bin_t* head = alarm_queue->head;
     if(!assert_not_null(head)) return;
@@ -79,19 +86,21 @@ void testAlarmInsertionOfThreeEvents(void) {
     event_bin_t* bin1 = head->next;
     if(!assert_not_null(bin1)) return;
     if(!assert_equal_uint16(test_e2_timeout - acc_value, bin1->e.rank)) return;
-    if(!assert_equal_ptr(test_e2_handler, bin1->e.handler)) return;
+    if(!assert_equal_ptr(assign_handler, bin1->e.handler)) return;
+    if(!assert_equal_ptr(e2_arg, bin1->e.arg_ptr)) return;
     acc_value += bin1->e.rank;
 
     event_bin_t* bin2 = bin1->next;
     if(!assert_not_null(bin2)) return;
     if(!assert_equal_uint16(test_e1_timeout - acc_value, bin2->e.rank)) return;
-    if(!assert_equal_ptr(test_e1_handler, bin2->e.handler)) return;
+    if(!assert_equal_ptr(assign_handler, bin2->e.handler)) return;
     acc_value += bin2->e.rank;
 
     event_bin_t* bin3 = bin2->next;
     if(!assert_not_null(bin3)) return;
     if(!assert_equal_uint16(test_e3_timeout - acc_value, bin3->e.rank)) return;
-    if(!assert_equal_ptr(test_e3_handler, bin3->e.handler)) return;
+    if(!assert_equal_ptr(assign_handler, bin3->e.handler)) return;
+    assert_equal_ptr(e3_arg, bin3->e.arg_ptr);
 }
 
 void testDummyHeadIsGoneAfterSomeTimeRunning(void) {
@@ -109,23 +118,15 @@ void testDummyHeadIsGoneAfterSomeTimeRunning(void) {
 void testDummyHandlerAndE2HandlerHaveRunAfterEnoughTime(void) {
     _delay_ms(20);
 
-    assert_equal_int(test_e2_timeout, handler_flag_value);
+    assert_equal_int(test_e2_arg, handler_flag_value);
 }
 
 
 
-void dummy_handler(void) {
+void dummy_handler(void* arg_ptr) {
 }
 
-void e1_handler(void) {
-    handler_flag_value = (int) test_e1_timeout;
-}
-
-void e2_handler(void) {
-    handler_flag_value = (int) test_e2_timeout;
-}
-
-void e3_handler(void) {
-    handler_flag_value = (int) test_e3_timeout;
+void assign_handler(void* arg_ptr) {
+    handler_flag_value = *((int*) arg_ptr);
 }
 

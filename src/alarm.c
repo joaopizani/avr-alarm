@@ -34,10 +34,11 @@ void alarm_timer_start(void) {
     TCCR1B |= getTimer1PrescaleBits_atmega168p(ALARM_PRESCALE);
 }
 
-void alarm_insert(time_ms_t timeout, handler_t handler) {
+void alarm_insert(time_ms_t timeout, handler_t handler, void* arg_ptr) {
     event_t e;
     e.rank = timeout;
     e.handler = handler;
+    e.arg_ptr = arg_ptr;
     relative_queue_insert(alarm_queue, e);
 }
 
@@ -47,12 +48,15 @@ inline void alarm_intr_handler(void) {
 
     if((head->rank) == 0) {
         handler_t f = head->handler;
+        void* arg_ptr = head->arg_ptr;
         relative_queue_remove(alarm_queue, *head);
+
         head = relative_queue_head(alarm_queue);
         (head->rank)--;
+
         sei();
 
-        (*f)();
+        (*f)(arg_ptr);
     } else {
         (head->rank)--;
     }
