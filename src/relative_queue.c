@@ -14,6 +14,7 @@ relative_queue_t* relative_queue_create(event_t e) {
     head->next = (event_bin_t*) 0;
 
     q->head = head;
+    q->last = head;
 
     return q;
 }
@@ -55,19 +56,7 @@ void relative_queue_insert(relative_queue_t* q, event_t e) {
     new->e.rank = e.rank - rank_acc;
     pred->next = new;
     new->next = (event_bin_t*) 0;
-}
-
-
-void print_queue(FILE* out, relative_queue_t* q) {
-    fprintf(out, "head_addr=(%p) {\n", q->head);
-
-    event_bin_t* it = q->head;
-    do {
-        fprintf(out, "\trank=%d, handler=(%p), arg_ptr=(%p)\n", it->e.rank, it->e.handler, it->e.arg_ptr);
-        it = it->next;
-    } while(it != (event_bin_t*) 0);
-
-    fprintf(out, "}\n");
+    q->last = new;
 }
 
 
@@ -95,6 +84,7 @@ void relative_queue_remove(relative_queue_t* q, event_t e) {
     if(succ->e.handler == e.handler) { // remove last
         free(succ);
         pred->next = NULL;
+        q->last = pred;
     }
 }
 
@@ -102,4 +92,30 @@ event_t* relative_queue_head(relative_queue_t* q) {
     return &(q->head->e);
 }
 
+event_t* relative_queue_last(relative_queue_t* q) {
+    return &(q->last->e);
+}
 
+uint16_t rank_sum(relative_queue_t* q) {
+    uint16_t sum = 0;
+
+    event_bin_t* it;
+    for(it = q->head; it != NULL; it = it->next) {
+        sum += it->e.rank;
+    }
+
+    return sum;
+}
+
+
+void print_queue(FILE* out, relative_queue_t* q) {
+    fprintf(out, "head_addr=(%p) {\n", q->head);
+
+    event_bin_t* it = q->head;
+    do {
+        fprintf(out, "\trank=%d, handler=(%p), arg_ptr=(%p)\n", it->e.rank, it->e.handler, it->e.arg_ptr);
+        it = it->next;
+    } while(it != (event_bin_t*) 0);
+
+    fprintf(out, "}\n");
+}

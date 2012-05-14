@@ -26,6 +26,7 @@ typedef struct _event_bin_t {
 
 typedef struct _relative_queue_t {
     event_bin_t* head;
+    event_bin_t* last;
 } relative_queue_t;
 
 
@@ -49,6 +50,17 @@ void relative_queue_remove(relative_queue_t* q, event_t e);
  * Returns a pointer to the first element, allowing it to be modified.
  */
 event_t* relative_queue_head(relative_queue_t* q);
+
+/** Obtains the last element of a queue.
+ * Returns a pointer, alowing it to be modified.
+ */
+event_t* relative_queue_last(relative_queue_t* q);
+
+/** Gets the absoulte (non-relative) rank of the last element
+ * in the queue.
+ */
+uint16_t rank_sum(relative_queue_t* q);
+
 
 /// Prints a relative queue to a stream device
 void print_queue(FILE* out, relative_queue_t* q);

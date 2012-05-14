@@ -29,6 +29,7 @@ int main(void) {
     testAlarmInsertionOfThreeEvents();
     testDummyHeadIsGoneAfterSomeTimeRunning();
     testDummyHandlerAndE2HandlerHaveRunAfterEnoughTime();
+    testGetRankOfLastValueReturnsCloseToTheRankOfE3();
 
     printf("Tests finished. If no error messages were displayed, success!\n");
 

@@ -121,6 +121,15 @@ void testDummyHandlerAndE2HandlerHaveRunAfterEnoughTime(void) {
     assert_equal_int(test_e2_arg, handler_flag_value);
 }
 
+void testGetRankOfLastValueReturnsCloseToTheRankOfE3(void) {
+    uint16_t rankSum = rank_sum(alarm_queue);
+
+    if(rankSum > ((TEST_E3_TIMOUT - TEST_E1_TIMOUT) + alarm_queue->head->e.rank)
+    || rankSum < 3) {
+        printf("ERROR: RankSum\n");
+    }
+}
+
 
 
 void dummy_handler(void* arg_ptr) {
