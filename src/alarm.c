@@ -61,7 +61,9 @@ inline void alarm_intr_handler(void) {
 
         sei();
 
-        (*f)(arg_ptr);
+        if(f != NULL) {
+            (*f)(arg_ptr);
+        }
     } else {
         (head->rank)--;
     }
