@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include <timers-atmega168p.h>
+#include <timers-atmega168.h>
 #include "alarm.h"
 
 
@@ -48,11 +48,14 @@ inline void alarm_intr_handler(void) {
     if((head->rank) == 0) {
         handler_t f = head->handler;
         relative_queue_remove(alarm_queue, *head);
+        head = relative_queue_head(alarm_queue);
+        (head->rank)--;
         sei();
-        (*f)();
-    }
 
-    (head->rank)--;
+        (*f)();
+    } else {
+        (head->rank)--;
+    }
 }
 
 /// main alarm timer interrupt handler.
