@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include "relative_queue.h"
 
-#define ALARM_PRESCALE 1024
+#define ALARM_PRESCALE 256
 #define ALARM_TIMER_FREQ_HZ (F_CPU / ALARM_PRESCALE)
 
 relative_queue_t* alarm_queue;
