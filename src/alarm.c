@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include <timers-atmega168.h>
+#include <timers-atmega168p.h>
 #include "alarm.h"
 
 
@@ -30,8 +30,8 @@ void alarm_init(void) {
 }
 
 void alarm_timer_start(void) {
-    // start timer 1024
-    TCCR1B |= 0b00000101; // TODO change to function specific of TIMER1
+    // start timer
+    TCCR1B |= getTimer1PrescaleBits_atmega168p(ALARM_PRESCALE);
 }
 
 void alarm_insert(time_ms_t timeout, handler_t handler) {
