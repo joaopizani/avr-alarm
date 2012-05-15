@@ -28,6 +28,14 @@ void relative_queue_insert(relative_queue_t* q, event_t e) {
     new->e.handler = e.handler;
     new->e.arg_ptr = e.arg_ptr;
 
+    // if the queue is empty
+    if(head == NULL) {
+        new->e.rank = e.rank;
+        new->next = NULL;
+        q->head = new;
+        return;
+    }
+
     // first
     if((rank_acc + head->e.rank) > e.rank) { // insert as new head
         new->e.rank = e.rank;
@@ -55,12 +63,18 @@ void relative_queue_insert(relative_queue_t* q, event_t e) {
     rank_acc += pred->e.rank;
     new->e.rank = e.rank - rank_acc;
     pred->next = new;
-    new->next = (event_bin_t*) 0;
+    new->next = NULL;
     q->last = new;
 }
 
 
 void relative_queue_remove(relative_queue_t* q, event_t e) {
+    // if queue is empty, do nothing
+    if(q->head == NULL) {
+        return;
+    }
+
+
     if(q->head->e.handler == e.handler) { // remove first
         q->head->next->e.rank += q->head->e.rank;
 
@@ -89,11 +103,13 @@ void relative_queue_remove(relative_queue_t* q, event_t e) {
 }
 
 event_t* relative_queue_head(relative_queue_t* q) {
-    return &(q->head->e);
+    event_bin_t* head = q->head;
+    return (head == NULL ? NULL : &(head->e));
 }
 
 event_t* relative_queue_last(relative_queue_t* q) {
-    return &(q->last->e);
+    event_bin_t* last = q->last;
+    return (last == NULL ? NULL : &(last->e));
 }
 
 uint16_t relative_queue_rank_sum(relative_queue_t* q) {
@@ -115,7 +131,8 @@ void print_queue(FILE* out, relative_queue_t* q) {
     do {
         fprintf(out, "\trank=%d, handler=(%p), arg_ptr=(%p)\n", it->e.rank, it->e.handler, it->e.arg_ptr);
         it = it->next;
-    } while(it != (event_bin_t*) 0);
+    } while(it != NULL);
 
     fprintf(out, "}\n");
 }
+

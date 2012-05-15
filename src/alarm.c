@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include <timers-atmega168p.h>
+#include <timers-atmega168.h>
 #include "relative_queue.h"
 #include "alarm.h"
 
@@ -22,6 +22,7 @@ void alarm_init(void) {
     alarm_queue = relative_queue_create(e);
 
     // configuring the underlying alarm timer
+    TCCR1A = 0x00; // just to guarantee
     TCCR1B |= _BV(WGM12); // clear on compare match
     TIMSK1 |= _BV(OCIE1A); // enable compare match intr.
 
@@ -32,7 +33,7 @@ void alarm_init(void) {
 
 void alarm_timer_start(void) {
     // start timer
-    TCCR1B |= getTimer1PrescaleBits_atmega168p(ALARM_PRESCALE);
+    TCCR1B |= getTimer1PrescaleBits_atmega168(ALARM_PRESCALE);
 }
 
 void alarm_insert(time_ms_t timeout, handler_t handler, void* arg_ptr) {
@@ -55,9 +56,6 @@ inline void alarm_intr_handler(void) {
         handler_t f = head->handler;
         void* arg_ptr = head->arg_ptr;
         relative_queue_remove(alarm_queue, *head);
-
-        head = relative_queue_head(alarm_queue);
-        (head->rank)--;
 
         sei();
 
