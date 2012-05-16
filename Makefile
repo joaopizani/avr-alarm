@@ -156,8 +156,9 @@ DUMPTRG=$(PROJECTNAME).s
 HEXROMTRG=$(PROJECTNAME).hex 
 HEXTRG=$(HEXROMTRG) $(PROJECTNAME).ee.hex
 GDBINITFILE=gdbinit-$(PROJECTNAME)
-
 INSTALL_PREFIX=$(PREFIX)
+INCLUDE_PREFIX=$(INSTALL_PREFIX)/include/$(PROJECTNAME)
+LIB_PREFIX=$(INSTALL_PREFIX)/lib/$(PROJECTNAME)
 
 
 # Define all object files.
@@ -213,10 +214,12 @@ writeflash: hex
 	 $(AVRDUDE_BAUD) -U flash:w:$(HEXROMTRG)
 
 install: $(LIBTRG)
-	install -d $(INSTALL_PREFIX)/lib
-	install $(LIBTRG) $(INSTALL_PREFIX)/lib
-	install -d $(INSTALL_PREFIX)/include
-	install $(PRJHEADERS) $(INSTALL_PREFIX)/include
+	install -d $(LIB_PREFIX)
+	install $(LIBTRG) $(LIB_PREFIX)
+ifdef PRJHEADERS
+	install -d $(INCLUDE_PREFIX)
+	install $(PRJHEADERS) $(INCLUDE_PREFIX)
+endif
 
 
 # How to generate the targets
