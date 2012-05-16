@@ -39,6 +39,9 @@
 # (e.g. 'at90s8515', see avr-gcc's mmcu options for possible values)
 MCU=atmega168
 
+# target controller clock frequency in Hz
+MCU_FREQ=16000000
+
 # id to use with programmer
 # default: PROGRAMMER_MCU=$(MCU)
 PROGRAMMER_MCU=atmega168
@@ -46,9 +49,7 @@ PROGRAMMER_MCU=atmega168
 # Name of our project - (use a single word, e.g. 'myproject')
 PROJECTNAME=avr-alarm
 
-# Library or executable image?
-# Set LIBRARY=1 if this project shall compile to a static lib,
-# leave it EMPTY to build an executable image
+# Set LIBRARY if the project shall compile to a static lib, leave undefined otherwise
 LIBRARY=1
 
 # Source files
@@ -69,7 +70,7 @@ LIBS=${EXT_LIBFLAGS}
 
 
 # additional macro definition flags
-DEFS=-DF_CPU=16000000UL
+EXT_DEFS=
 
 # Optimization level - use s (size opt), 1, 2, 3 or 0 (off)
 OPTLEVEL=1
@@ -77,13 +78,23 @@ OPTLEVEL=1
 
 #####      AVR Dude 'writeflash' options       #####
 AVRDUDE_PROGRAMMERID=arduino
-
 AVRDUDE_PORT=/dev/ttyUSB0
 
 # Necessary for arduino to set this up as 19200
 AVRDUDE_BAUD=-b 19200
 
 
+#### Simulation options. Change only what you think is necessary
+SIM_MCU=$(PROGRAMMER_MCU)
+SIM_EXIT_ADDR=0xDE
+SIM_WRITE_ADDR=0xFF
+SIM_READ_ADDR=0xFE
+
+#### Leave these undefined if you want to accept the defaults. Defaults are:
+#### SIM_TIME=200 (ms),  SIM_DIR=sim,  SIM_TRACES=$(SIM_DIR)/traces-selected
+SIM_TIME=
+SIM_DIR=
+SIM_TRACES=
 
 
 
@@ -97,6 +108,30 @@ AVRDUDE_BAUD=-b 19200
 #####                                          #####
 ####################################################
 
+#### Macro definitions
+DEFS=-DF_CPU=$(MCU_FREQ) -DSIM_WRITE=$(SIM_WRITE_ADDR) -DSIM_READ=$(SIM_READ_ADDR) -DSIM_EXIT=$(SIM_EXIT_ADDR)
+
+#### Simulation
+ifndef SIM_DIR
+SIM_DIR=sim
+endif
+
+SIM_STDOUT_FILENAME=simulation-stdout.txt
+SIM_STDERR_FILENAME=simulation-stderr.txt
+SIM_WAVES_FILENAME=waves.vcd
+SIM_TRACES_FILENAME=traces-selected
+
+ifndef SIM_TRACES
+SIM_TRACES=$(SIM_DIR)/$(SIM_TRACES_FILENAME)
+endif
+
+ifndef SIM_TIME
+SIM_TIME=200
+endif
+
+SIM_STDOUT=$(SIM_DIR)/$(SIM_STDOUT_FILENAME)
+SIM_STDERR=$(SIM_DIR)/$(SIM_STDERR_FILENAME)
+SIM_WAVES=$(SIM_DIR)/$(SIM_WAVES_FILENAME)
 
 ##### Flags ####
 
@@ -286,8 +321,8 @@ $(LIBTRG): $(OBJDEPS)
 #####   avr-gdb -x gdbinit-myproject           #####
 gdbinit: $(GDBINITFILE)
 
-$(GDBINITFILE): $(TRG)
-	@echo "file $(TRG)" > $(GDBINITFILE)
+$(GDBINITFILE): $(EXETRG)
+	@echo "file $(EXETRG)" > $(GDBINITFILE)
 	
 	@echo "target remote localhost:1212" \
 		                >> $(GDBINITFILE)
@@ -297,6 +332,21 @@ $(GDBINITFILE): $(TRG)
 	@echo "continue"    >> $(GDBINITFILE)
 	@echo
 	@echo "Use 'avr-gdb -x $(GDBINITFILE)'"
+
+
+
+#### Simulation targets, using simulavr and (possibly) avr-gdb ####
+simulate-gdb: $(GDBINITFILE)
+	mkdir -p $(SIM_DIR)
+	simulavr -d $(SIM_MCU) -F $(MCU_FREQ) -f $(EXETRG) -W $(SIM_WRITE_ADDR),- -R $(SIM_READ_ADDR),- -e $(SIM_EXIT_ADDR) \
+	-g 2> $(SIM_STDERR) 1> $(SIM_STDOUT) &
+	@sleep 1
+	avr-gdbtui -x $(GDBINITFILE)
+
+simulate-vcd: $(EXETRG)
+	mkdir -p $(SIM_DIR)
+	simulavr -d $(SIM_MCU) -F $(MCU_FREQ) -f $(EXETRG) -W $(SIM_WRITE_ADDR),- -R $(SIM_READ_ADDR),- -e $(SIM_EXIT_ADDR) \
+	-c vcd:$(SIM_TRACES):$(SIM_WAVES) -m $(SIM_TIME)000000
 
 
 
