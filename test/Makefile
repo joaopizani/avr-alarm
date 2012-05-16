@@ -22,32 +22,35 @@
 ####################################################
 
 
-## With some modifications to suit Arduino's
-## oddities related to bootloader and programmer
+## With some modifications to suit Arduino's oddities related to
+## bootloader and programmer, and also including the option to generate
+## and install a static library (.a archive) from this same Makefile
 ##
 ## These modifications were done by
 ##
-## João Paulo Pizani Flor
-## joaopizani@gmail.com
+## João Paulo Pizani Flor <joaopizani@gmail.com>
 ## http://joaopizani.hopto.org
-
 
 
 #####         Target Specific Details          #####
 #####     Customize these for your project     #####
 
 # Name of target controller 
-# (e.g. 'at90s8515', see the available avr-gcc mmcu 
-# options for possible values)
+# (e.g. 'at90s8515', see the available avr-gcc's options for possible values)
 MCU=atmega168p
+
+# target controller clock frequency in Hz
+MCU_FREQ=16000000
 
 # id to use with programmer
 # default: PROGRAMMER_MCU=$(MCU)
 PROGRAMMER_MCU=atmega168
 
-# Name of our project
-# (use a single word, e.g. 'myproject')
+# Name of our project - (use a single word, e.g. 'myproject')
 PROJECTNAME=avr-alarm-test
+
+# Set LIBRARY if the project shall compile to a static lib, leave undefined otherwise
+LIBRARY=
 
 # Source files
 # List C/C++/Assembly source files:
@@ -66,39 +69,38 @@ PRJHEADERS=debug.h \
 		   alarm_test.h
 
 
+# additional includes and libraries to link in are defined in paths.def
 include paths.def
-
-# additional includes (e.g. -I/path/to/mydir)
 INC=${EXT_INCFLAGS}
-
-# libraries to link in (e.g. -lmylib)
 LIBS=${EXT_LIBFLAGS}
 
-# additional macro definition flags
-DEFS=-DF_CPU=16000000UL
 
-# Optimization level, 
-# use s (size opt), 1, 2, 3 or 0 (off)
+# additional macro definition flags
+EXT_DEFS=
+
+# Optimization level - use s (size opt), 1, 2, 3 or 0 (off)
 OPTLEVEL=1
 
 
 #####      AVR Dude 'writeflash' options       #####
-#####  If you are using the avrdude program
-#####  (http://www.bsdhome.com/avrdude/) to write
-#####  to the MCU, you can set the following config
-#####  options and use 'make writeflash' to program
-#####  the device.
 AVRDUDE_PROGRAMMERID=arduino
-
-# port--serial or parallel port to which your 
-# hardware programmer is attached
-#
 AVRDUDE_PORT=/dev/ttyUSB0
 
 # Necessary for arduino to set this up as 19200
 AVRDUDE_BAUD=-b 19200
 
 
+#### Simulation options. Change only what you think is necessary
+SIM_MCU=$(PROGRAMMER_MCU)
+SIM_EXIT_ADDR=0xDE
+SIM_WRITE_ADDR=0xFF
+SIM_READ_ADDR=0xFE
+
+#### Leave these undefined if you want to accept the defaults. Defaults are:
+#### SIM_TIME=200 (ms),  SIM_DIR=sim,  SIM_TRACES=$(SIM_DIR)/traces-selected
+SIM_TIME=
+SIM_DIR=
+SIM_TRACES=
 
 
 
@@ -111,6 +113,32 @@ AVRDUDE_BAUD=-b 19200
 ##### nonetheless                              #####
 #####                                          #####
 ####################################################
+
+
+#### Macro definitions
+DEFS=-DF_CPU=$(MCU_FREQ) -DSIM_WRITE=$(SIM_WRITE_ADDR) -DSIM_READ=$(SIM_READ_ADDR) -DSIM_EXIT=$(SIM_EXIT_ADDR)
+
+#### Simulation
+ifndef SIM_DIR
+SIM_DIR=sim
+endif
+
+SIM_STDOUT_FILENAME=simulation-stdout.txt
+SIM_STDERR_FILENAME=simulation-stderr.txt
+SIM_WAVES_FILENAME=waves.vcd
+SIM_TRACES_FILENAME=traces-selected
+
+ifndef SIM_TRACES
+SIM_TRACES=$(SIM_DIR)/$(SIM_TRACES_FILENAME)
+endif
+
+ifndef SIM_TIME
+SIM_TIME=200
+endif
+
+SIM_STDOUT=$(SIM_DIR)/$(SIM_STDOUT_FILENAME)
+SIM_STDERR=$(SIM_DIR)/$(SIM_STDERR_FILENAME)
+SIM_WAVES=$(SIM_DIR)/$(SIM_WAVES_FILENAME)
 
 
 ##### Flags ####
@@ -171,8 +199,9 @@ DUMPTRG=$(PROJECTNAME).s
 HEXROMTRG=$(PROJECTNAME).hex 
 HEXTRG=$(HEXROMTRG) $(PROJECTNAME).ee.hex
 GDBINITFILE=gdbinit-$(PROJECTNAME)
-
 INSTALL_PREFIX=$(PREFIX)
+INCLUDE_PREFIX=$(INSTALL_PREFIX)/include/$(PROJECTNAME)
+LIB_PREFIX=$(INSTALL_PREFIX)/lib/$(PROJECTNAME)
 
 
 # Define all object files.
@@ -228,10 +257,12 @@ writeflash: hex
 	 $(AVRDUDE_BAUD) -U flash:w:$(HEXROMTRG)
 
 install: $(LIBTRG)
-	install -d $(INSTALL_PREFIX)/lib
-	install $(LIBTRG) $(INSTALL_PREFIX)/lib
-	install -d $(INSTALL_PREFIX)/include
-	install $(PRJHEADERS) $(INSTALL_PREFIX)/include
+	install -d $(LIB_PREFIX)
+	install $(LIBTRG) $(LIB_PREFIX)
+ifdef PRJHEADERS
+	install -d $(INCLUDE_PREFIX)
+	install $(PRJHEADERS) $(INCLUDE_PREFIX)
+endif
 
 
 # How to generate the targets
@@ -298,8 +329,8 @@ $(LIBTRG): $(OBJDEPS)
 #####   avr-gdb -x gdbinit-myproject           #####
 gdbinit: $(GDBINITFILE)
 
-$(GDBINITFILE): $(TRG)
-	@echo "file $(TRG)" > $(GDBINITFILE)
+$(GDBINITFILE): $(EXETRG)
+	@echo "file $(EXETRG)" > $(GDBINITFILE)
 	
 	@echo "target remote localhost:1212" \
 		                >> $(GDBINITFILE)
@@ -312,6 +343,21 @@ $(GDBINITFILE): $(TRG)
 
 
 
+#### Simulation targets, using simulavr and (possibly) avr-gdb ####
+simulate-gdb: $(GDBINITFILE)
+	mkdir -p $(SIM_DIR)
+	simulavr -d $(SIM_MCU) -F $(MCU_FREQ) -f $(EXETRG) -W $(SIM_WRITE_ADDR),- -R $(SIM_READ_ADDR),- -e $(SIM_EXIT_ADDR) \
+	-g 2> $(SIM_STDERR) 1> $(SIM_STDOUT) &
+	@sleep 1
+	avr-gdbtui -x $(GDBINITFILE)
+
+simulate-vcd: $(EXETRG)
+	mkdir -p $(SIM_DIR)
+	simulavr -d $(SIM_MCU) -F $(MCU_FREQ) -f $(EXETRG) -W $(SIM_WRITE_ADDR),- -R $(SIM_READ_ADDR),- -e $(SIM_EXIT_ADDR) \
+	-c vcd:$(SIM_TRACES):$(SIM_WAVES) -m $(SIM_TIME)000000
+
+
+
 #### Cleanup ####
 clean:
 	$(REMOVE) $(LIBTRG) $(LIBTRG).map
@@ -320,6 +366,7 @@ clean:
 	$(REMOVE) $(LST) $(GDBINITFILE)
 	$(REMOVE) $(GENASMFILES)
 	$(REMOVE) $(HEXTRG)
+	$(REMOVE) $(SIM_STDOUT) $(SIM_STDERR) $(SIM_WAVES)
 	$(REMOVE) *~
 	
 
