@@ -22,32 +22,34 @@
 ####################################################
 
 
-## With some modifications to suit Arduino's
-## oddities related to bootloader and programmer
+## With some modifications to suit Arduino's oddities related to
+## bootloader and programmer, and also including the option to generate
+## and install a static library (.a archive) from this same Makefile
 ##
 ## These modifications were done by
 ##
-## João Paulo Pizani Flor
-## joaopizani@gmail.com
+## João Paulo Pizani Flor <joaopizani@gmail.com>
 ## http://joaopizani.hopto.org
-
 
 
 #####         Target Specific Details          #####
 #####     Customize these for your project     #####
 
 # Name of target controller 
-# (e.g. 'at90s8515', see the available avr-gcc mmcu 
-# options for possible values)
+# (e.g. 'at90s8515', see avr-gcc's mmcu options for possible values)
 MCU=atmega168
 
 # id to use with programmer
 # default: PROGRAMMER_MCU=$(MCU)
 PROGRAMMER_MCU=atmega168
 
-# Name of our project
-# (use a single word, e.g. 'myproject')
+# Name of our project - (use a single word, e.g. 'myproject')
 PROJECTNAME=avr-alarm
+
+# Library or executable image?
+# Set LIBRARY=1 if this project shall compile to a static lib,
+# leave it EMPTY to build an executable image
+LIBRARY=1
 
 # Source files
 # List C/C++/Assembly source files:
@@ -60,33 +62,22 @@ PRJHEADERS=src/relative_queue.h \
 		   src/alarm.h \
 
 
+# additional includes and libs to link in are defined in paths.def
 include paths.def
-
-# additional includes (e.g. -I/path/to/mydir)
 INC=${EXT_INCFLAGS}
-
-# libraries to link in (e.g. -lmylib)
 LIBS=${EXT_LIBFLAGS}
+
 
 # additional macro definition flags
 DEFS=-DF_CPU=16000000UL
 
-# Optimization level, 
-# use s (size opt), 1, 2, 3 or 0 (off)
+# Optimization level - use s (size opt), 1, 2, 3 or 0 (off)
 OPTLEVEL=1
 
 
 #####      AVR Dude 'writeflash' options       #####
-#####  If you are using the avrdude program
-#####  (http://www.bsdhome.com/avrdude/) to write
-#####  to the MCU, you can set the following config
-#####  options and use 'make writeflash' to program
-#####  the device.
 AVRDUDE_PROGRAMMERID=arduino
 
-# port--serial or parallel port to which your 
-# hardware programmer is attached
-#
 AVRDUDE_PORT=/dev/ttyUSB0
 
 # Necessary for arduino to set this up as 19200
