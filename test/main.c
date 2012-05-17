@@ -7,7 +7,7 @@
  */
 #include <stdio.h>
 #include <avr/interrupt.h>
-#include "debug.h"
+#include <avr-utils/sim_debug.h>
 #include "relative_queue_test.h"
 #include "alarm_test.h"
 
@@ -33,7 +33,7 @@ int main(void) {
 
     printf("Tests finished. If no error messages were displayed, success!\n");
 
-    while(1); // we must have a loop, otherwise it doesn't make any sense :P
+    debug_exit(0);
 
     return 0;
 }

@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <util/delay.h>
-#include "assert_helpers.h"
+#include <avr-utils/assert_helpers.h>
 #include "alarm_test.h"
 #include "../src/alarm.h"
 #include "../src/relative_queue.h"

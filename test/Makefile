@@ -54,18 +54,14 @@ LIBRARY=
 
 # Source files
 # List C/C++/Assembly source files:
-PRJSRC=debug.c \
-	   assert_helpers.c \
-	   relative_queue_test.c \
+PRJSRC=relative_queue_test.c \
 	   alarm_test.c \
 	   main.c
 
 
 # Header files
 # List all headers of the project. They will be installed in the case of a lib.
-PRJHEADERS=debug.h \
-		   assert_helpers.h \
-		   relative_queue_test.h \
+PRJHEADERS=relative_queue_test.h \
 		   alarm_test.h
 
 
@@ -116,7 +112,10 @@ SIM_TRACES=
 
 
 #### Macro definitions
-DEFS=-DF_CPU=$(MCU_FREQ) -DSIM_WRITE=$(SIM_WRITE_ADDR) -DSIM_READ=$(SIM_READ_ADDR) -DSIM_EXIT=$(SIM_EXIT_ADDR)
+DEFS=-DF_CPU=$(MCU_FREQ) \
+	 -DSIM_WRITE="(*((volatile char *) $(SIM_WRITE_ADDR)))" \
+	 -DSIM_READ="(*((volatile char *) $(SIM_READ_ADDR)))" \
+	 -DSIM_EXIT="(*((volatile char *) $(SIM_EXIT_ADDR)))"
 
 #### Simulation
 ifndef SIM_DIR
