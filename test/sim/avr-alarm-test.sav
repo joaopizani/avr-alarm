@@ -1,0 +1,36 @@
+[*]
+[*] GTKWave Analyzer v3.3.34 (w)1999-2012 BSI
+[*] Tue May 29 14:17:03 2012
+[*]
+[dumpfile] "/home/joaopizani/avr/avr-alarm/test/sim/avr-alarm-test-wav.vcd"
+[dumpfile_mtime] "Tue May 29 14:14:28 2012"
+[dumpfile_size] 114982
+[savefile] "/home/joaopizani/avr/avr-alarm/test/sim/avr-alarm-test.sav"
+[timestart] 0
+[size] 1000 600
+[pos] 19 246
+*-21.000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 223
+[signals_width] 134
+[sst_expanded] 1
+[sst_vpaned_height] 160
+@28
+IRQ.VECTOR11
+@200
+-
+@24
+TIMER1.Counter[15:0]
+TIMER1.OCRAH[7:0]
+TIMER1.OCRAL[7:0]
+TIMER1.OCRBH[7:0]
+TIMER1.OCRBL[7:0]
+@28
+TIMER1.TCCRA[7:0]
+TIMER1.TCCRB[7:0]
+@29
+TIMER1.TCCRC[7:0]
+@22
+TIMER1.TCNTH[7:0]
+TIMER1.TCNTL[7:0]
+[pattern_trace] 1
+[pattern_trace] 0
