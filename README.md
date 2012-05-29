@@ -1,8 +1,9 @@
 AVR-Alarm: Asynchronous time-triggered actions for AVRs
 =======================================================
 The avr-alarm library allows its users to **schedule** the handling of events happening at arbitrary moments
-during the execution of the program. Let's just start with a quick and dirty example:
+during program execution. Let's just start with a quick and dirty example:
 
+    ```c
     #include <stdlib.h>
     #include <stdint.h>
     #include <avr/interrupt.h>
@@ -13,15 +14,16 @@ during the execution of the program. Let's just start with a quick and dirty exa
     void main(void) {
         alarm_init();
         alarm_timer_start();
-        
+
         // do some stuff
-        
+
         uint8_t ns[2] = { 23, 42 };
         alarm_insert(2000, handler_portb, &ns[0]);
         alarm_insert(4000, handler_portb, &ns[1]);
-        
+
         while(1);
     }
+    ```
 
 The code above defines a function named `handler_portb`, which sole task is to write a (variable) number to
 PORTB. Then, in the body of main, after some boring initialization and doing some other stuff, we:
@@ -31,8 +33,8 @@ PORTB. Then, in the body of main, after some boring initialization and doing som
  2. Schedule another call to `handler_portb`, this time happening 4 s after the scheduling itself and giving as
     argument a pointer to ns[1].
 
-Notice the type of function `handler_portb`: It's not a coincidence. It's the type that any handler function
-must have in order to be used with avr-alarm. This is explained in more details in the API section.
+Notice the type of the function `handler_portb`: It's not a coincidence. It's the type that any handler
+function must have in order to be used with avr-alarm. This is explained in more details in the API section.
 
 
 How it works - just the amount you need to know to be able to use it
@@ -65,16 +67,16 @@ These are the types and functions one must know in order to use avr-alarm correc
 This is the type to be used whenever a time argument is needed when dealing with avr-alarm's functions. This
 is just a typedef for an unsigned integer, but the name of the type itself reminds the programmer that values
 with this type shall be time **in miliseconds**. Here's the definition of `time_ms_t`:
-
+    ```c
     typedef uint16_t time_ms_t;
-
+    ```
 
 ### type: handler\_t
 The type of an event handler function. An event handler function is a function that receives **one** void
 pointer as argument and has return type *void*. Here's the definition of `handler_t`:
-
+    ```c
     typedef void (*handler_t)(void*);
-
+    ```
 
 ### function: void alarm\_init(void)
 Initializes the data structures used by avr-alarm to handle event scheduling and time counting. It creates and
@@ -120,7 +122,7 @@ Limitations and other remarks
 
     When passing an argument to a handler function, there's an implicit contract that must be obeyed:
 
-    > The type of the ACTUAL pointer parameter passed at the call site of a handler must match the
+    > The type of the ACTUAL pointer parameter passed at the call site of alarm\_insert must match the
     > target of the cast which happens in the first line of the handler's body.
 
  2. **Using excessively long handler functions might lead to memory corruption and deadlocks:**
@@ -150,18 +152,19 @@ To use avr-alarm in an application (or other library), you must add the path of 
 ($PREFIX/include) to the compiler's include path, and link your application with the static lib file
 (libavr-alarm.a) found under $PREFIX/lib. In the case that you are using a Makefile based on the template
 at [avr-utils](http://github.com/joaopizani/avr-utils), you can just add the following to your paths.def:
-
+    ```bash
     AVRALARM_ROOT=[PREFIX where you installed avr-alarm]
     AVRALARM_INCLUDE=${AVRALARM_ROOT}/include
     AVRALARM_LIBS=${AVRALARM_ROOT}/lib/avr-alarm
     AVRALARM_INCFLAGS=-I${AVRALARM_INCLUDE}
     AVRALARM_LIBFLAGS=-Wl,--whole-archive -L${AVRALARM_LIBS} -lavr-alarm -Wl,--no-whole-archive
+    ```
 
 Observation: the *-Wl,--whole-archive* and *-Wl,--no-whole-archive* options are needed because the library
 includes interrupt handlers, which without these options wouldn't be linked in. Finally, you should
 append AVRALARM\_INCFLAGS and AVRALARM\_LIBFLAGS, respectively, to the variables EXT\_INCFLAGS and EXT\_LIBFLAGS,
 which should be present at the end of your paths.def. Like this:
-
+    ```bash
     EXT_INCFLAGS=${LIB1_INCFLAGS} ${LIB2_INCFLAGS} ${AVRALARM_INCFLAGS} ...
     EXT_LIBFLAGS=${LIB1_LIBFLAGS} ${LIB2_LIBFLAGS} ${AVRALARM_LIBFLAGS} ...
-
+    ```
