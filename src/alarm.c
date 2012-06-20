@@ -42,6 +42,9 @@ void alarm_insert(time_ms_t timeout, handler_t handler, void* arg_ptr) {
     e.handler = handler;
     e.arg_ptr = arg_ptr;
 
+    // busy-wait for a slot in the queue.
+    while(relative_queue_size(alarm_queue) >= ALARM_MAX_EVENTS);
+
     relative_queue_insert(alarm_queue, e);
 }
 
