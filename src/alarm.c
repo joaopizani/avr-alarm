@@ -41,6 +41,7 @@ void alarm_insert(time_ms_t timeout, handler_t handler, void* arg_ptr) {
     e.rank = timeout;
     e.handler = handler;
     e.arg_ptr = arg_ptr;
+
     relative_queue_insert(alarm_queue, e);
 }
 

@@ -15,6 +15,10 @@
 #define ALARM_TIMER_FREQ_HZ (F_CPU / ALARM_PRESCALE)
 #define ALARM_TIMER_FREQ_KHZ (ALARM_TIMER_FREQ_HZ / 1000)
 
+//TODO magical number, we shall define it based on the memory of the device and the
+//size of the event struct
+#define ALARM_MAX_EVENTS 20
+
 
 relative_queue_t* alarm_queue;
 
