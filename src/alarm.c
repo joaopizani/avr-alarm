@@ -15,7 +15,7 @@
 
 /** Initializes the queue used by the alarm.
  */
-void alarm_init(void) {
+void alarm_init(time_ms_t period) {
     event_t e;
     e.rank = 0;
     e.handler = NULL;
@@ -27,7 +27,7 @@ void alarm_init(void) {
     TIMSK1 |= _BV(OCIE1A); // enable compare match intr.
 
     // set compare match to 1ms
-    const uint16_t alarmTimerPeriodCount = ALARM_TIMER_FREQ_HZ / 1000;
+    const uint16_t alarmTimerPeriodCount = period * ALARM_TIMER_FREQ_KHZ;
     OCR1A = alarmTimerPeriodCount;
 }
 

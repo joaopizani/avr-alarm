@@ -13,6 +13,8 @@
 
 #define ALARM_PRESCALE 256
 #define ALARM_TIMER_FREQ_HZ (F_CPU / ALARM_PRESCALE)
+#define ALARM_TIMER_FREQ_KHZ (ALARM_TIMER_FREQ_HZ / 1000)
+
 
 relative_queue_t* alarm_queue;
 
@@ -20,9 +22,9 @@ relative_queue_t* alarm_queue;
 typedef uint16_t time_ms_t;
 
 
-/** Initializes the queue used by the alarm.
+/** Initializes the queue used by the alarm, with user-defined period between 1ms and 1000ms
  */
-void alarm_init(void);
+void alarm_init(time_ms_t period);
 
 /** Starts the underlying alarm timer. At this moment the alarm starts counting time.
  */
