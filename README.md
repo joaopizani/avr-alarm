@@ -3,7 +3,7 @@ AVR-Alarm: Asynchronous time-triggered actions for AVRs
 The avr-alarm library allows its users to **schedule** the handling of events happening at arbitrary moments
 during program execution. Let's just start with a quick and dirty example:
 
-``` c
+```c
     #include <stdlib.h>
     #include <stdint.h>
     #include <avr/interrupt.h>
@@ -29,9 +29,9 @@ The code above defines a function named `handler_portb`, which sole task is to w
 PORTB. Then, in the body of main, after some boring initialization and doing some other stuff, we:
 
  1. Schedule a call to `handler_portb` to happen 2 s later than the call to `alarm_insert` itself. The argument
-    to be passed to `handler_portb` when the event is triggered is the *address* (pointer) of ns[0].
+    to be passed to `handler_portb` when the event is triggered is the *address* (pointer) of ns\[0\].
  2. Schedule another call to `handler_portb`, this time happening 4 s after the scheduling itself and giving as
-    argument a pointer to ns[1].
+    argument a pointer to ns\[1\].
 
 Notice the type of the function `handler_portb`: It's not a coincidence. It's the type that any handler
 function must have in order to be used with avr-alarm. This is explained in more details in the API section.
@@ -67,14 +67,14 @@ These are the types and functions one must know in order to use avr-alarm correc
 This is the type to be used whenever a time argument is needed when dealing with avr-alarm's functions. This
 is just a typedef for an unsigned integer, but the name of the type itself reminds the programmer that values
 with this type shall be time **in miliseconds**. Here's the definition of `time_ms_t`:
-``` c
+```c
     typedef uint16_t time_ms_t;
 ```
 
 ### type: handler\_t
 The type of an event handler function. An event handler function is a function that receives **one** void
 pointer as argument and has return type *void*. Here's the definition of `handler_t`:
-``` c
+```c
     typedef void (*handler_t)(void*);
 ```
 
@@ -108,7 +108,7 @@ in the queue is reached - in miliseconds. The time returned corresponds to *t_la
 
  * t\_last is the instant when the deadline of the last scheduled event will be reached.
  * t\_0 is the instant when `alarm_until_last_deadline` itself was called, OR the instant when
-   `alarm_timer_start` will be called (in case it hasn't been called yet).)`
+   `alarm_timer_start` will be called (in case it hasn't been called yet).
 
 
 Limitations and other remarks
@@ -152,7 +152,7 @@ To use avr-alarm in an application (or other library), you must add the path of 
 ($PREFIX/include) to the compiler's include path, and link your application with the static lib file
 (libavr-alarm.a) found under $PREFIX/lib. In the case that you are using a Makefile based on the template
 at [avr-utils](http://github.com/joaopizani/avr-utils), you can just add the following to your paths.def:
-``` bash
+```bash
     AVRALARM_ROOT=[PREFIX where you installed avr-alarm]
     AVRALARM_INCLUDE=${AVRALARM_ROOT}/include
     AVRALARM_LIBS=${AVRALARM_ROOT}/lib/avr-alarm
@@ -164,7 +164,7 @@ Observation: the *-Wl,--whole-archive* and *-Wl,--no-whole-archive* options are 
 includes interrupt handlers, which without these options wouldn't be linked in. Finally, you should
 append AVRALARM\_INCFLAGS and AVRALARM\_LIBFLAGS, respectively, to the variables EXT\_INCFLAGS and EXT\_LIBFLAGS,
 which should be present at the end of your paths.def. Like this:
-``` bash
+```bash
     EXT_INCFLAGS=${LIB1_INCFLAGS} ${LIB2_INCFLAGS} ${AVRALARM_INCFLAGS} ...
     EXT_LIBFLAGS=${LIB1_LIBFLAGS} ${LIB2_LIBFLAGS} ${AVRALARM_LIBFLAGS} ...
 ```
