@@ -1,4 +1,6 @@
-AVRUTILS_ROOT=/home/joaopizani/build/avr/avr-utils
+AVR_ROOT=/home/joaopizani/build/avr
+
+AVRUTILS_ROOT=${AVR_ROOT}/avr-utils
 AVRUTILS_INCLUDE=${AVRUTILS_ROOT}/include
 AVRUTILS_LIBS=${AVRUTILS_ROOT}/lib/avr-utils
 
