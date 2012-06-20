@@ -12,7 +12,7 @@ during program execution. Let's just start with a quick and dirty example:
     void handler_portb(void* n_uint8) { PORTB = *((uint8_t*) n_uint8); }
 
     void main(void) {
-        alarm_init();
+        alarm_init(1);
         alarm_timer_start();
 
         // do some stuff
@@ -44,9 +44,9 @@ The fundamental principle of avr-alarm is pretty simple: We use a periodic event
 moment. The counting of time in avr-alarm uses the **compare match interrupt of TIMER1**. Therefore, when
 using avr-alarm in your application, TIMER1 **should not** be used for anything else.
 
-AVR-Alarm actually does its job repeatedly at every milisecond - that is its *resolution* - meaning that you
-cannot schedule an event to happen at a moment with a precision less than a milisecond. The job of avr-alarm
-is to manage a **queue** of events that are scheduled to happen, and at each milisecond check if the time has
+AVR-Alarm actually does its job repeatedly at every **n** miliseconds - that is its *resolution* - meaning that you
+cannot schedule an event to happen at a moment with a precision less than **n** miliseconds. The job of avr-alarm
+is to manage a **queue** of events that are scheduled to happen, and at each **n** miliseconds check if the time has
 come for the event in front of the queue to finally happen...
 
 AVR-Alarm uses a *relative ordered queue* - ordered by the *remaining time until event execution*. You can
@@ -78,10 +78,10 @@ pointer as argument and has return type *void*. Here's the definition of `handle
     typedef void (*handler_t)(void*);
 ```
 
-### function: void alarm\_init(void)
+### function: void alarm\_init(time_ms_t period)
 Initializes the data structures used by avr-alarm to handle event scheduling and time counting. It creates and
 initializes the queue used to store scheduled events and it configures the timer used by the alarm
-implementation (TIMER1).
+implementation (TIMER1). Sets the resolution of the timer to *period* miliseconds.
 
  1. **Important:** This function must be called before any call to any other function of avr-alarm.
  2. **Important:** This function configures the timer, but **does not** start it. Therefore, the client has
@@ -89,9 +89,9 @@ implementation (TIMER1).
 
 
 ### function: void alarm\_timer\_start(void)
-Starts the underlying timer, that from now on will fire at each milisecond. Only at this moment does avr-alarm
+Starts the underlying timer, that from now on will fire once every **n** miliseconds. Only at this moment does avr-alarm
 consider that time is "moving". If any event has been scheduled before a call to alarm\_timer\_start(), then
-*t0* (the initial time instant) is defined as being the instant when alarm\_timer\_start was called.)
+*t0* (the initial time instant) is defined as being the instant when alarm\_timer\_start was called.
 
 
 ### function: void alarm\_insert(time\_ms\_t timeout, handler\_t handler, void\* arg\_ptr)

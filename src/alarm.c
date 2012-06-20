@@ -13,9 +13,14 @@
 #include "alarm.h"
 
 
+static time_ms_t alarm_period = 0;
+
+
 /** Initializes the queue used by the alarm.
  */
 void alarm_init(time_ms_t period) {
+    alarm_period = period;
+
     event_t e;
     e.rank = 0;
     e.handler = NULL;
@@ -27,7 +32,7 @@ void alarm_init(time_ms_t period) {
     TIMSK1 |= _BV(OCIE1A); // enable compare match intr.
 
     // set compare match to 1ms
-    const uint16_t alarmTimerPeriodCount = period * ALARM_TIMER_FREQ_KHZ;
+    const uint16_t alarmTimerPeriodCount = alarm_period * ALARM_TIMER_FREQ_KHZ;
     OCR1A = alarmTimerPeriodCount;
 }
 
@@ -63,7 +68,7 @@ inline void alarm_intr_handler(void) {
             (*f)(arg_ptr);
         }
     } else {
-        (head->rank)--;
+        head->rank += alarm_period;
     }
 }
 
