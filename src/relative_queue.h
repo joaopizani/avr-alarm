@@ -27,6 +27,7 @@ typedef struct _event_bin_t {
 typedef struct _relative_queue_t {
     event_bin_t* head;
     event_bin_t* last;
+    uint16_t absolute_rank_last;
     uint8_t size;
 } relative_queue_t;
 

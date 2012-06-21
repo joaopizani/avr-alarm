@@ -18,6 +18,9 @@ relative_queue_t* relative_queue_create(event_t e) {
 
     q->size = 1;
 
+    // increase the relative rank sum (rank of the last) when a new last is inserted
+    q->absolute_rank_last = e.rank;
+
     return q;
 }
 
@@ -40,7 +43,20 @@ void relative_queue_insert(relative_queue_t* q, event_t e) {
         return;
     }
 
-    // first
+    // prioritize check if last, to avoid a costly search when it's not needed (append is VERY common)
+    if(e.rank >= q->absolute_rank_last) {
+        new->e.rank = e.rank - q->absolute_rank_last;
+        q->last->next = new;
+        new->next = NULL;
+        q->last = new;
+
+        // set rank of the last when a new last is inserted
+        q->absolute_rank_last = e.rank;
+    }
+
+
+    // "normal" cases
+    // when first
     if((rank_acc + head->e.rank) > e.rank) { // insert as new head
         new->e.rank = e.rank;
         new->next = head;
@@ -49,7 +65,7 @@ void relative_queue_insert(relative_queue_t* q, event_t e) {
         return;
     }
 
-    // between
+    // when in between
     event_bin_t *pred, *succ;
     for(pred = head, succ = head->next; succ != NULL; pred = pred->next, succ = succ->next) {
         rank_acc += pred->e.rank;
@@ -62,13 +78,6 @@ void relative_queue_insert(relative_queue_t* q, event_t e) {
             return;
         }
     }
-
-    // last
-    rank_acc += pred->e.rank;
-    new->e.rank = e.rank - rank_acc;
-    pred->next = new;
-    new->next = NULL;
-    q->last = new;
 }
 
 
@@ -101,6 +110,9 @@ void relative_queue_remove(relative_queue_t* q, event_t e) {
     }
 
     if(succ->e.handler == e.handler) { // remove last
+        // set rank of the last when a last is removed
+        q->absolute_rank_last -= succ->e.rank;
+
         free(succ);
         pred->next = NULL;
         q->last = pred;
@@ -118,14 +130,7 @@ event_t* relative_queue_last(relative_queue_t* q) {
 }
 
 uint16_t relative_queue_rank_sum(relative_queue_t* q) {
-    uint16_t sum = 0;
-
-    event_bin_t* it;
-    for(it = q->head; it != NULL; it = it->next) {
-        sum += it->e.rank;
-    }
-
-    return sum;
+    return q->absolute_rank_last;
 }
 
 uint8_t relative_queue_size(relative_queue_t* q) {
