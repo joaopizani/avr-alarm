@@ -68,7 +68,7 @@ inline void alarm_intr_handler(void) {
             (*f)(arg_ptr);
         }
     } else {
-        head->rank += alarm_period;
+        head->rank -= alarm_period;
     }
 }
 
