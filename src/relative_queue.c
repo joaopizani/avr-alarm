@@ -16,6 +16,8 @@ relative_queue_t* relative_queue_create(event_t e) {
     q->head = head;
     q->last = head;
 
+    q->size = 1;
+
     // increase the relative rank sum (rank of the last) when a new last is inserted
     q->absolute_rank_last = e.rank;
 
@@ -31,6 +33,7 @@ void relative_queue_insert(relative_queue_t* q, event_t e) {
     new->e.handler = e.handler;
     new->e.arg_ptr = e.arg_ptr;
 
+    q->size += 1; // we will insert a new element, no matter what... :)
 
     // if the queue is empty
     if(head == NULL) {
@@ -84,6 +87,7 @@ void relative_queue_remove(relative_queue_t* q, event_t e) {
         return;
     }
 
+    q->size -= 1; // we will remove an element, no matter what... :)
 
     if(q->head->e.handler == e.handler) { // remove first
         q->head->next->e.rank += q->head->e.rank;
@@ -127,6 +131,10 @@ event_t* relative_queue_last(relative_queue_t* q) {
 
 uint16_t relative_queue_rank_sum(relative_queue_t* q) {
     return q->absolute_rank_last;
+}
+
+uint8_t relative_queue_size(relative_queue_t* q) {
+    return q->size;
 }
 
 

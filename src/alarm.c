@@ -6,6 +6,7 @@
  *
  */
 #include <stdlib.h>
+#include <stdint.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr-utils/timers-atmega168.h>
@@ -46,6 +47,14 @@ void alarm_insert(time_ms_t timeout, handler_t handler, void* arg_ptr) {
     e.rank = timeout;
     e.handler = handler;
     e.arg_ptr = arg_ptr;
+
+    // busy-wait for a slot in the queue. The size variable and the function call
+    // need all to be VOLATILE AND LITERAL, with no optimizations whatsoever.
+    // the cast to volatile is needed so that GCC don't read this from a register, and
+    // perform a MEMORY read at every while iteration. This way, a write in the interrupt
+    // context can be noticed here.
+    while(   *( (volatile uint8_t *) &(alarm_queue->size) )  >=  ALARM_MAX_EVENTS   );
+
     relative_queue_insert(alarm_queue, e);
 }
 

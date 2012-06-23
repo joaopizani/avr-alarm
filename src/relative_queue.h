@@ -28,6 +28,7 @@ typedef struct _relative_queue_t {
     event_bin_t* head;
     event_bin_t* last;
     uint16_t absolute_rank_last;
+    uint8_t size;
 } relative_queue_t;
 
 
@@ -62,8 +63,12 @@ event_t* relative_queue_last(relative_queue_t* q);
  */
 uint16_t relative_queue_rank_sum(relative_queue_t* q);
 
+/** Returns the size (number of elements) of a queue.
+ */
+uint8_t relative_queue_size(relative_queue_t* q);
 
-/// Prints a relative queue to a stream device
+
+// Prints a relative queue to a stream device
 void print_queue(FILE* out, relative_queue_t* q);
 
 
